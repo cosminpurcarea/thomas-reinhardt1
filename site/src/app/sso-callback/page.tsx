@@ -1,7 +1,10 @@
+"use client";
+
 import { AuthenticateWithRedirectCallback } from "@clerk/nextjs";
 
 /**
  * Completes OAuth / SSO redirects initiated from sign-up (or sign-in).
+ * Client-only so the build never prerenders without Clerk React context.
  */
 export default function SsoCallbackPage() {
   return (
