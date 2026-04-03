@@ -1,0 +1,4 @@
+# Root-level ignores (Next.js app lives in /site)
+.DS_Store
+Thumbs.db
+*.log

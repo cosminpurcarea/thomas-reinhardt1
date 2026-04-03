@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+:root {
+  /* Executive dark theme (tuned to the provided blue palette). */
+  --background: #061427;
+  --foreground: #eaf3ff;
+  --muted: #a8bedb;
+  --card: rgba(12, 32, 56, 0.72);
+  --card-strong: #0b2340;
+  --border: rgba(47, 140, 255, 0.25);
+  --accent: #2f8cff;
+  --accent-strong: #1c6fe6;
+  --accent-soft: rgba(47, 140, 255, 0.18);
+  --ring: rgba(47, 140, 255, 0.45);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Keep the same palette in dark mode to match brand styling. */
+    --background: #061427;
+    --foreground: #eaf3ff;
+  }
+}
+
+body {
+  background:
+    radial-gradient(1200px circle at top right, var(--accent-soft), transparent 60%),
+    radial-gradient(900px circle at 20% 10%, rgba(0, 209, 255, 0.14), transparent 55%),
+    linear-gradient(180deg, #071a2d 0%, #041021 55%, #03101d 100%);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+a {
+  color: inherit;
+}
+
+/* Clerk SignIn/SignUp host: default text stays light on navy (variables + elements handle specifics). */
+.auth-clerk-host {
+  color: #f8fafc;
+}
+
