@@ -27,23 +27,30 @@ export async function stampPdfCopyright({
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
   const dateText = formatDateUtc(downloadedAt);
-  const footer = `Copyright Thomas Reinhardt - ${dateText} - ${uniqueId} - ${fullName}`;
+  const line1 = `Copyright Thomas Reinhardt — ${dateText}`;
+  const line2 = `${uniqueId} — ${fullName}`;
   const fontSize = 8;
+  const lineGap = 10;
+
+  const drawOpts = {
+    size: fontSize,
+    font,
+    color: rgb(0.28, 0.28, 0.28),
+    opacity: 0.95,
+  };
 
   for (const page of pdfDoc.getPages()) {
     const { width } = page.getSize();
-    const textWidth = font.widthOfTextAtSize(footer, fontSize);
-    const x = Math.max(24, (width - textWidth) / 2);
-    const y = 14;
+    const yBottom = 14;
+    const yTop = yBottom + lineGap;
 
-    page.drawText(footer, {
-      x,
-      y,
-      size: fontSize,
-      font,
-      color: rgb(0.28, 0.28, 0.28),
-      opacity: 0.95,
-    });
+    const w1 = font.widthOfTextAtSize(line1, fontSize);
+    const w2 = font.widthOfTextAtSize(line2, fontSize);
+    const x1 = Math.max(24, (width - w1) / 2);
+    const x2 = Math.max(24, (width - w2) / 2);
+
+    page.drawText(line1, { x: x1, y: yTop, ...drawOpts });
+    page.drawText(line2, { x: x2, y: yBottom, ...drawOpts });
   }
 
   return await pdfDoc.save();
