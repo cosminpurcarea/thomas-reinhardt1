@@ -13,13 +13,29 @@ export default function PrivacyPage() {
           Digital Services Data Protection Act (TDDDG, formerly TTDSG).
         </p>
         <p>
-          <strong>Controller (Art. 4(7) GDPR)</strong>: REPLACE_WITH_FULL_LEGAL_ENTITY_NAME,
-          REPLACE_WITH_FULL_POSTAL_ADDRESS, REPLACE_WITH_CONTACT_EMAIL,
-          REPLACE_WITH_CONTACT_PHONE.
+          <strong>Controller (Art. 4(7) GDPR)</strong>: Thomas Reinhardt,
+          based in Lower Saxony (<em>Niedersachsen</em>), Germany. Email:{" "}
+          <a
+            href="mailto:contact@thomas-reinhardt.com"
+            className="text-[var(--foreground)] underline"
+          >
+            contact@thomas-reinhardt.com
+          </a>
+          . Please use this address for a full postal address or company details
+          if you need them for legal correspondence.
         </p>
         <p>
-          <strong>Data Protection Contact / DPO</strong>: REPLACE_WITH_DPO_NAME_AND_EMAIL
-          (if no DPO is legally required, provide a dedicated privacy contact).
+          <strong>Data Protection Contact / DPO</strong>: For privacy-related
+          requests, contact{" "}
+          <a
+            href="mailto:contact@thomas-reinhardt.com"
+            className="text-[var(--foreground)] underline"
+          >
+            contact@thomas-reinhardt.com
+          </a>
+          . No data protection officer (<em>Datenschutzbeauftragter</em>) is
+          appointed under Art. 37 GDPR unless legally required; this contact
+          serves as the responsible point of contact.
         </p>
         <p>
           <strong>Categories of personal data</strong>: account identifiers,
@@ -62,8 +78,22 @@ export default function PrivacyPage() {
           <strong>Right to complain</strong>: you may lodge a complaint with a
           supervisory authority, especially in the EU Member State of your
           habitual residence, place of work, or place of alleged infringement
-          (Art. 77 GDPR). In Germany, include your competent Landesdatenschutzbehoerde here:
-          REPLACE_WITH_COMPETENT_AUTHORITY_NAME_AND_CONTACT.
+          (Art. 77 GDPR). For the federal state of Lower Saxony (
+          <em>Niedersachsen</em>), the competent authority is the{" "}
+          <strong>
+            State Commissioner for Data Protection Lower Saxony
+          </strong>{" "}
+          (<em>Die Landesbeauftragte für den Datenschutz Niedersachsen</em>),
+          Prinzenstraße 5, 30159 Hannover, Germany. Further information:{" "}
+          <a
+            href="https://www.lfd.niedersachsen.de"
+            className="text-[var(--foreground)] underline"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            www.lfd.niedersachsen.de
+          </a>
+          .
         </p>
         <p>
           <strong>Automated decision-making</strong>: unless explicitly stated

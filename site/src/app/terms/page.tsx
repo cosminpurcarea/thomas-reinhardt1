@@ -10,8 +10,15 @@ export default function TermsPage() {
           and access to downloadable materials.
         </p>
         <p>
-          <strong>Provider</strong>: REPLACE_WITH_FULL_LEGAL_ENTITY_NAME,
-          REPLACE_WITH_FULL_POSTAL_ADDRESS, REPLACE_WITH_CONTACT_EMAIL.
+          <strong>Provider</strong>: Thomas Reinhardt, Lower Saxony (
+          <em>Niedersachsen</em>), Germany. Contact:{" "}
+          <a
+            href="mailto:contact@thomas-reinhardt.com"
+            className="text-[var(--foreground)] underline"
+          >
+            contact@thomas-reinhardt.com
+          </a>
+          .
         </p>
         <p>
           <strong>Scope of service</strong>: this site provides consulting-related
@@ -55,8 +62,9 @@ export default function TermsPage() {
         <p>
           <strong>Applicable law and venue</strong>: subject to mandatory consumer
           protection rules, these terms are governed by German law. If you are
-          a merchant under German law, the place of jurisdiction is
-          REPLACE_WITH_CITY_IN_GERMANY.
+          a merchant (<em>Kaufmann</em>) under German law, the exclusive place
+          of jurisdiction is <strong>Hannover, Germany</strong> (federal state
+          of Lower Saxony / <em>Niedersachsen</em>), where legally permissible.
         </p>
         <p>
           <strong>Consumer dispute resolution</strong>: indicate whether you are

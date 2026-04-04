@@ -2,8 +2,8 @@ import { clerkClient } from "@clerk/nextjs/server";
 import { getResendClient, getResendFrom } from "./resendClient";
 import { createElement } from "react";
 import { createUnsubscribeToken } from "./unsubscribeToken";
+import { getProductBySlug } from "@/lib/sanity/queries";
 import { getPublicSiteUrl } from "@/lib/siteUrl";
-import { getNewsletterLogoForEmail } from "./newsletterLogoAttachment";
 
 function escapeHtml(value: string): string {
   return value
@@ -12,6 +12,32 @@ function escapeHtml(value: string): string {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
+}
+
+/** Public links in marketing email: avoid exposing preview deployment hosts. */
+const CANONICAL_SITE_ORIGIN = "https://thomas-reinhardt.com";
+
+function emailPublicOrigin(envBase: string): string {
+  const explicit = process.env.EMAIL_PUBLIC_SITE_URL?.trim().replace(/\/$/, "");
+  if (explicit) return explicit;
+  if (envBase.includes("vercel.app")) return CANONICAL_SITE_ORIGIN;
+  return envBase;
+}
+
+/** ~3 lines of plain text in typical mail clients (~75–80 chars per line). */
+function excerptProductDescription(raw: string | null | undefined): string {
+  if (!raw?.trim()) return "";
+  const normalized = raw.replace(/\r\n/g, "\n").trim();
+  const lines = normalized
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
+  const joined = lines.slice(0, 3).join(" ");
+  const maxLen = 240;
+  if (joined.length <= maxLen) return joined;
+  const cut = joined.slice(0, maxLen);
+  const lastSpace = cut.lastIndexOf(" ");
+  return (lastSpace > 60 ? cut.slice(0, lastSpace) : cut) + "\u2026";
 }
 
 async function getConsentedUserEmails(): Promise<string[]> {
@@ -130,30 +156,38 @@ export async function sendGDPRSafeFreeProductRelease(input: {
   productTitle: string;
   productSlug: string;
 }) {
-  const baseUrl = getPublicSiteUrl();
-  const logo = await getNewsletterLogoForEmail();
+  const envBase = getPublicSiteUrl();
+  const origin = emailPublicOrigin(envBase);
   const encodedSlug = encodeURIComponent(input.productSlug);
-  const productUrl = `${baseUrl}/products/${encodedSlug}`;
-  const downloadUrl = `${baseUrl}/products/${encodedSlug}/download`;
+  const productUrl = `${origin}/products/${encodedSlug}`;
+  const downloadUrl = `${origin}/products/${encodedSlug}/download`;
   const safeTitle = input.productTitle;
   const safeTitleHtml = escapeHtml(safeTitle);
-  const safeSiteUrlHtml = escapeHtml(baseUrl);
   const currentYear = new Date().getUTCFullYear();
+
+  const product = await getProductBySlug(input.productSlug);
+  const excerptRaw = excerptProductDescription(product?.description ?? null);
+  const excerptHtml = escapeHtml(
+    excerptRaw ||
+      "A new resource has been published and is now ready for access."
+  );
 
   return sendGDPRSafeNewsletter({
     subject: `New free download: ${safeTitle}`,
-    attachments: logo.attachments,
+    attachments: [],
     renderForRecipient: (recipientEmail) => {
       const token = createUnsubscribeToken(recipientEmail);
-      const unsubscribeUrl = `${baseUrl}/newsletter/unsubscribe?e=${encodeURIComponent(
+      const unsubscribeUrl = `${origin}/newsletter/unsubscribe?e=${encodeURIComponent(
         token.email
       )}&exp=${token.exp}&sig=${encodeURIComponent(token.sig)}`;
       return {
         text: [
           "Thomas Reinhardt - New free download available",
-          baseUrl,
           "",
           `${safeTitle}`,
+          "",
+          excerptRaw ||
+            "A new resource has been published and is now ready for access.",
           "",
           `Open product page: ${productUrl}`,
           `Start download: ${downloadUrl}`,
@@ -167,21 +201,24 @@ export async function sendGDPRSafeFreeProductRelease(input: {
             </div>
             <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse: collapse; background-color: #eef2f7;">
               <tr>
-                <td align="center" style="padding: 32px 16px; font-family: 'Segoe UI', Arial, Helvetica, sans-serif;">
+                <td align="center" style="padding: 32px 16px; font-family: Arial, Helvetica, sans-serif;">
                   <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width: 600px; border-collapse: separate; background-color: #ffffff; border: 1px solid #dbe4ee; border-radius: 12px; box-shadow: 0 1px 3px rgba(15, 41, 66, 0.06);">
                     <tr>
-                      <td style="padding: 28px 32px 8px 32px; border-bottom: 1px solid #e8eef5;">
-                        <a href="${baseUrl}" style="text-decoration: none; display: inline-block;">
-                          <img
-                            src="${logo.imgSrc}"
-                            alt="Thomas Reinhardt"
-                            width="200"
-                            style="display: block; width: 200px; max-width: 100%; height: auto; border: 0; outline: none;"
-                          />
-                        </a>
-                        <p style="margin: 16px 0 0 0; font-size: 13px; line-height: 1.5;">
-                          <a href="${baseUrl}" style="color: #2563eb; text-decoration: none; font-weight: 600;">${safeSiteUrlHtml}</a>
-                        </p>
+                      <td style="padding: 28px 32px 20px 32px; border-bottom: 1px solid #e8eef5; text-align: left;">
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse;">
+                          <tr>
+                            <td style="padding: 0; text-align: left; vertical-align: top;">
+                              <div style="font-family: Arial, Helvetica, sans-serif; line-height: 1.15; text-align: left;">
+                                <div style="margin: 0; color: #0c2744; font-size: 15px; font-weight: 700; letter-spacing: 0.14em;">
+                                  THOMAS
+                                </div>
+                                <div style="margin: 4px 0 0 0; color: #0c2744; font-size: 17px; font-weight: 700; letter-spacing: 0.1em;">
+                                  REINHARDT
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        </table>
                       </td>
                     </tr>
                     <tr>
@@ -192,8 +229,8 @@ export async function sendGDPRSafeFreeProductRelease(input: {
                         <h1 style="margin: 12px 0 0 0; color: #0c2744; font-size: 26px; line-height: 1.25; font-weight: 700;">
                           ${safeTitleHtml}
                         </h1>
-                        <p style="margin: 14px 0 0 0; color: #4a5568; font-size: 16px; line-height: 1.6;">
-                          A new resource has been published and is now ready for access.
+                        <p style="margin: 14px 0 0 0; color: #4a5568; font-size: 15px; line-height: 1.55;">
+                          ${excerptHtml}
                         </p>
                       </td>
                     </tr>
@@ -229,9 +266,6 @@ export async function sendGDPRSafeFreeProductRelease(input: {
                     </tr>
                     <tr>
                       <td style="padding: 20px 32px 28px 32px; border-top: 1px solid #e8eef5; text-align: center;">
-                        <p style="margin: 0 0 8px 0; color: #64748b; font-size: 12px; line-height: 1.5;">
-                          <a href="${baseUrl}" style="color: #2563eb; text-decoration: none; font-weight: 600;">${safeSiteUrlHtml}</a>
-                        </p>
                         <p style="margin: 0; color: #64748b; font-size: 11px; line-height: 1.5;">
                           &copy; ${currentYear} Thomas Reinhardt. All rights reserved.
                         </p>
