@@ -137,6 +137,7 @@ export async function sendGDPRSafeFreeProductRelease(input: {
   const downloadUrl = `${baseUrl}/products/${encodedSlug}/download`;
   const safeTitle = input.productTitle;
   const safeTitleHtml = escapeHtml(safeTitle);
+  const safeSiteUrlHtml = escapeHtml(baseUrl);
   const currentYear = new Date().getUTCFullYear();
 
   return sendGDPRSafeNewsletter({
@@ -150,6 +151,7 @@ export async function sendGDPRSafeFreeProductRelease(input: {
       return {
         text: [
           "Thomas Reinhardt - New free download available",
+          baseUrl,
           "",
           `${safeTitle}`,
           "",
@@ -159,59 +161,83 @@ export async function sendGDPRSafeFreeProductRelease(input: {
           `Unsubscribe from newsletter emails: ${unsubscribeUrl}`,
         ].join("\n"),
         html: `
-          <div style="margin: 0; padding: 28px 14px; background-color: #030c1a;">
+          <div style="margin: 0; padding: 0; background-color: #eef2f7;">
             <div style="display:none; max-height:0; overflow:hidden; opacity:0; color:transparent;">
               New free download: ${safeTitleHtml}
             </div>
-            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width: 640px; margin: 0 auto; border-collapse: separate;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse: collapse; background-color: #eef2f7;">
               <tr>
-                <td style="padding: 0 0 14px 0; color: #8ca3bd; font-family: Inter, Segoe UI, Arial, Helvetica, sans-serif; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;">
-                  <img
-                    src="${logo.imgSrc}"
-                    alt="Thomas Reinhardt"
-                    width="220"
-                    style="display: block; width: 220px; max-width: 100%; height: auto; border: 0;"
-                  />
-                </td>
-              </tr>
-              <tr>
-                <td style="border: 1px solid #1f3552; border-radius: 16px; background: linear-gradient(180deg, #071427 0%, #051126 100%); padding: 28px 24px; font-family: Inter, Segoe UI, Arial, Helvetica, sans-serif;">
-                  <p style="margin: 0; color: #8ca3bd; font-size: 13px;">New free download available</p>
-                  <h1 style="margin: 10px 0 0 0; color: #f2f7ff; font-size: 28px; line-height: 1.2; font-weight: 700;">
-                    ${safeTitleHtml}
-                  </h1>
-                  <p style="margin: 14px 0 0 0; color: #c8d8ea; font-size: 15px; line-height: 1.6;">
-                    A new resource has been published and is now ready for access.
-                  </p>
-
-                  <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top: 22px;">
+                <td align="center" style="padding: 32px 16px; font-family: 'Segoe UI', Arial, Helvetica, sans-serif;">
+                  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width: 600px; border-collapse: separate; background-color: #ffffff; border: 1px solid #dbe4ee; border-radius: 12px; box-shadow: 0 1px 3px rgba(15, 41, 66, 0.06);">
                     <tr>
-                      <td style="padding: 0 12px 10px 0;">
-                        <a href="${downloadUrl}" style="display: inline-block; border-radius: 999px; background-color: #2f8cff; color: #020b1a; text-decoration: none; font-weight: 700; font-size: 14px; padding: 12px 20px;">
-                          Start download
+                      <td style="padding: 28px 32px 8px 32px; border-bottom: 1px solid #e8eef5;">
+                        <a href="${baseUrl}" style="text-decoration: none; display: inline-block;">
+                          <img
+                            src="${logo.imgSrc}"
+                            alt="Thomas Reinhardt"
+                            width="200"
+                            style="display: block; width: 200px; max-width: 100%; height: auto; border: 0; outline: none;"
+                          />
                         </a>
+                        <p style="margin: 16px 0 0 0; font-size: 13px; line-height: 1.5;">
+                          <a href="${baseUrl}" style="color: #2563eb; text-decoration: none; font-weight: 600;">${safeSiteUrlHtml}</a>
+                        </p>
                       </td>
-                      <td style="padding: 0 0 10px 0;">
-                        <a href="${productUrl}" style="display: inline-block; border-radius: 999px; border: 1px solid #2a4465; color: #dce9f8; text-decoration: none; font-weight: 600; font-size: 14px; padding: 11px 18px;">
-                          Open product page
-                        </a>
+                    </tr>
+                    <tr>
+                      <td style="padding: 24px 32px 8px 32px;">
+                        <p style="margin: 0; color: #3b82f6; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;">
+                          New free download available
+                        </p>
+                        <h1 style="margin: 12px 0 0 0; color: #0c2744; font-size: 26px; line-height: 1.25; font-weight: 700;">
+                          ${safeTitleHtml}
+                        </h1>
+                        <p style="margin: 14px 0 0 0; color: #4a5568; font-size: 16px; line-height: 1.6;">
+                          A new resource has been published and is now ready for access.
+                        </p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 8px 32px 24px 32px;">
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                          <tr>
+                            <td style="padding: 0 12px 12px 0; vertical-align: middle;">
+                              <a href="${downloadUrl}" style="display: inline-block; border-radius: 999px; background-color: #0c4a6e; color: #ffffff; text-decoration: none; font-weight: 700; font-size: 14px; padding: 12px 22px;">
+                                Start download
+                              </a>
+                            </td>
+                            <td style="padding: 0 0 12px 0; vertical-align: middle;">
+                              <a href="${productUrl}" style="display: inline-block; border-radius: 999px; border: 2px solid #0c4a6e; color: #0c4a6e; text-decoration: none; font-weight: 600; font-size: 14px; padding: 10px 20px; background-color: #ffffff;">
+                                Open product page
+                              </a>
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 0 32px 28px 32px;">
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse: collapse;">
+                          <tr>
+                            <td style="padding: 14px 16px; border: 1px solid #dbe4ee; border-radius: 8px; background-color: #f8fafc; color: #4a5568; font-size: 13px; line-height: 1.55;">
+                              You can manage consent in your account, or
+                              <a href="${unsubscribeUrl}" style="color: #2563eb; text-decoration: underline; font-weight: 600;">unsubscribe from newsletter emails</a>.
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 20px 32px 28px 32px; border-top: 1px solid #e8eef5; text-align: center;">
+                        <p style="margin: 0 0 8px 0; color: #64748b; font-size: 12px; line-height: 1.5;">
+                          <a href="${baseUrl}" style="color: #2563eb; text-decoration: none; font-weight: 600;">${safeSiteUrlHtml}</a>
+                        </p>
+                        <p style="margin: 0; color: #64748b; font-size: 11px; line-height: 1.5;">
+                          &copy; ${currentYear} Thomas Reinhardt. All rights reserved.
+                        </p>
                       </td>
                     </tr>
                   </table>
-
-                  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top: 18px; border-collapse: collapse;">
-                    <tr>
-                      <td style="padding: 12px 14px; border: 1px solid #1e3551; border-radius: 10px; color: #8ca3bd; font-size: 12px; line-height: 1.5;">
-                        You can manage consent in your account, or
-                        <a href="${unsubscribeUrl}" style="color: #78b4ff; text-decoration: underline;"> unsubscribe from newsletter emails</a>.
-                      </td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
-              <tr>
-                <td style="padding: 14px 2px 0 2px; color: #6f86a2; font-family: Inter, Segoe UI, Arial, Helvetica, sans-serif; font-size: 11px; line-height: 1.5;">
-                  &copy; ${currentYear} Thomas Reinhardt. All rights reserved.
                 </td>
               </tr>
             </table>
