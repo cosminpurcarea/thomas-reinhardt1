@@ -39,12 +39,18 @@ export default function RootLayout({
     <>
       <header className="sticky top-0 z-40 border-b border-[var(--border)] bg-[rgba(6,20,39,0.78)] backdrop-blur supports-[backdrop-filter]:bg-[rgba(6,20,39,0.6)]">
         <div className="mx-auto grid w-full max-w-6xl grid-cols-[1fr_auto] items-center gap-x-4 px-6 py-4 md:grid-cols-[1fr_auto_1fr] md:gap-x-0">
-          <a href="/" className="flex items-center gap-3 justify-self-start">
-            <img
-              src="/branding/logo-header.png"
-              alt="Thomas Reinhardt — Consulting &amp; interim management"
-              className="h-16 w-auto max-h-[6rem] object-contain object-left sm:h-[4.25rem] md:h-24 lg:h-[5.5rem]"
-            />
+          <a
+            href="/"
+            className="inline-flex flex-col items-start justify-self-start text-left leading-none no-underline"
+            style={{ fontFamily: "Arial, Helvetica, sans-serif" }}
+            aria-label="Thomas Reinhardt — Home"
+          >
+            <span className="text-sm font-semibold tracking-[0.18em] text-white md:text-base">
+              THOMAS
+            </span>
+            <span className="-mt-[7px] text-base font-bold tracking-[0.12em] text-white md:text-lg">
+              REINHARDT
+            </span>
           </a>
 
           <nav className="hidden items-center justify-center gap-8 md:flex md:justify-self-center">

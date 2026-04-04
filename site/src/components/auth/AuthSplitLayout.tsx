@@ -38,12 +38,18 @@ export default function AuthSplitLayout({
         aria-label="Brand"
       >
         <div>
-          <a href="/" className="inline-flex items-center gap-3">
-            <img
-              src="/branding/logo-header.png"
-              alt="Thomas Reinhardt — Consulting &amp; interim management"
-              className="h-16 w-auto max-h-[6rem] object-contain object-left md:h-20 lg:h-[5.5rem]"
-            />
+          <a
+            href="/"
+            className="inline-flex flex-col items-start text-left leading-none no-underline"
+            style={{ fontFamily: "Arial, Helvetica, sans-serif" }}
+            aria-label="Thomas Reinhardt — Home"
+          >
+            <span className="text-sm font-semibold tracking-[0.18em] text-white md:text-base">
+              THOMAS
+            </span>
+            <span className="-mt-[7px] text-base font-bold tracking-[0.12em] text-white md:text-lg">
+              REINHARDT
+            </span>
           </a>
           <h1 className="mt-10 text-2xl font-semibold tracking-tight text-white md:mt-14 md:text-3xl lg:text-[1.75rem] lg:leading-tight">
             {c.headline}
