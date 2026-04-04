@@ -38,6 +38,24 @@ export type LatestListingSpotlight = {
   updatedAt: string;
 };
 
+/** Home spotlight only: keeps RSC/HTML payload bounded for hosts with response limits. */
+const MAX_SPOTLIGHT_DESCRIPTION_CHARS = 8000;
+
+function truncateSpotlightDescription(
+  row: LatestListingSpotlight
+): LatestListingSpotlight {
+  const raw = row.description;
+  if (raw == null) return row;
+  const text = typeof raw === "string" ? raw : String(raw);
+  if (text.length <= MAX_SPOTLIGHT_DESCRIPTION_CHARS) {
+    return { ...row, description: text };
+  }
+  return {
+    ...row,
+    description: `${text.slice(0, MAX_SPOTLIGHT_DESCRIPTION_CHARS)}…`,
+  };
+}
+
 const productFields = `
   _id,
   _createdAt,
@@ -107,7 +125,7 @@ export async function getLatestListingSpotlight(): Promise<LatestListingSpotligh
   try {
     const row = await client.fetch<LatestListingSpotlight | null>(query);
     if (!row?.slug) return null;
-    return row;
+    return truncateSpotlightDescription(row);
   } catch {
     return null;
   }

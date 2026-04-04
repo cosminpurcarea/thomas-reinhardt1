@@ -15,23 +15,29 @@ export type AdminSession =
   | { status: "ok"; userId: string; email: string };
 
 export async function getAdminSession(): Promise<AdminSession> {
-  const { userId } = await auth();
-  if (!userId) return { status: "signed_out" };
+  try {
+    const { userId } = await auth();
+    if (!userId) return { status: "signed_out" };
 
-  const clerk = await clerkClient();
-  const me = await clerk.users.getUser(userId);
-  const email =
-    (me.primaryEmailAddress?.emailAddress as string | undefined) ??
-    ((me as { emailAddresses?: { emailAddress?: string }[] }).emailAddresses?.[0]
-      ?.emailAddress as string | undefined) ??
-    null;
+    const clerk = await clerkClient();
+    const me = await clerk.users.getUser(userId);
+    const email =
+      (me.primaryEmailAddress?.emailAddress as string | undefined) ??
+      ((me as { emailAddresses?: { emailAddress?: string }[] }).emailAddresses?.[0]
+        ?.emailAddress as string | undefined) ??
+      null;
 
-  const adminEmailsRaw = process.env.ADMIN_EMAILS;
-  if (!email || !isAdminEmail(email, adminEmailsRaw)) {
-    return { status: "forbidden", email };
+    const adminEmailsRaw = process.env.ADMIN_EMAILS;
+    if (!email || !isAdminEmail(email, adminEmailsRaw)) {
+      return { status: "forbidden", email };
+    }
+
+    return { status: "ok", userId, email };
+  } catch (err) {
+    // Avoid 500 on public routes if Clerk/env is misconfigured or the API errors transiently.
+    console.error("[getAdminSession]", err);
+    return { status: "signed_out" };
   }
-
-  return { status: "ok", userId, email };
 }
 
 /** True when the signed-in user’s email is listed in `ADMIN_EMAILS`. */
