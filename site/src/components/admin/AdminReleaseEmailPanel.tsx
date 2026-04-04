@@ -128,15 +128,15 @@ export default function AdminReleaseEmailPanel({
         </p>
       ) : (
         <>
-          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
-            <label className="w-full sm:w-80">
+          <div className="mt-4 flex w-full flex-col gap-3 sm:flex-row sm:items-end sm:gap-4">
+            <label className="min-w-0 w-full flex-1">
               <span className="text-sm font-semibold text-[var(--muted)]">
                 Product
               </span>
               <select
                 value={selectedSlug}
                 onChange={(e) => setSelectedSlug(e.target.value)}
-                className="admin-native-select mt-2 w-full rounded-xl border border-[var(--border)] px-3 py-2 text-sm font-medium"
+                className="admin-native-select mt-2 w-full min-w-0 rounded-xl border border-[var(--border)] px-3 py-2 text-sm font-medium"
               >
                 {freeProducts.map((p) => (
                   <option key={p.slug} value={p.slug}>
@@ -149,7 +149,7 @@ export default function AdminReleaseEmailPanel({
             <button
               type="button"
               disabled={!selectedProduct || sending || selectedCount === 0}
-              className="inline-flex h-11 items-center justify-center rounded-full bg-[var(--accent)] px-6 text-sm font-semibold text-black transition hover:bg-[var(--accent-strong)] disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex h-11 shrink-0 items-center justify-center self-end rounded-full bg-[var(--accent)] px-6 text-sm font-semibold text-black transition hover:bg-[var(--accent-strong)] disabled:cursor-not-allowed disabled:opacity-60"
               onClick={async () => {
                 if (!selectedProduct) return;
                 setSending(true);

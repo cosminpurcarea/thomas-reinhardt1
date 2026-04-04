@@ -52,7 +52,7 @@ export default function FooterSocialLinks() {
         </svg>
       </a>
       <a
-        href="https://www.youtube.com/"
+        href="https://www.youtube.com/@ThomasReinhardt-executive"
         target="_blank"
         rel="noopener noreferrer"
         className={iconClass}
