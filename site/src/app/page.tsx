@@ -64,15 +64,16 @@ export default async function Home() {
         <div className="grid gap-4 md:grid-cols-3">
           <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-5">
             <div className="text-sm font-semibold text-[var(--accent)]">
-              System-level program orchestration
+              Strategic view
             </div>
             <div className="mt-2 text-[var(--foreground)] font-semibold">
-              Align all execution layers into a single control system
+              See the whole program before commitments harden
             </div>
             <div className="mt-2 text-sm text-[var(--muted)]">
-              Establish an integrated control model where governance, testing,
-              and cutover operate as one coordinated system—ensuring decisions,
-              outcomes, and execution remain continuously synchronized.
+              Step back from workstream noise to align scope, timing, and
+              investment with business outcomes—so leadership can steer early,
+              when trade-offs are still cheap, instead of reacting after
+              execution locks in cost and risk.
             </div>
           </div>
 
@@ -92,15 +93,15 @@ export default async function Home() {
 
           <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-5">
             <div className="text-sm font-semibold text-[var(--accent)]">
-              Evidence-based execution readiness
+              Integrated program orchestration
             </div>
             <div className="mt-2 text-[var(--foreground)] font-semibold">
-              Validate deployment readiness through measurable control criteria
+              Align governance, testing, and cutover as one operating system
             </div>
             <div className="mt-2 text-sm text-[var(--muted)]">
-              Replace assumption-driven readiness with a quantified validation
-              framework, ensuring all program dimensions meet defined
-              thresholds before execution.
+              Connect how decisions are made, how quality is proven, and how
+              go-live is run—so teams stop working in silos and the program
+              moves as a single, traceable chain from design through cutover.
             </div>
           </div>
         </div>
