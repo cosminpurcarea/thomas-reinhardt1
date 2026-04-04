@@ -10,7 +10,7 @@ export default function FooterSocialLinks() {
   return (
     <div className="flex items-center justify-center gap-5">
       <a
-        href="https://x.com/"
+        href="https://x.com/ThomasRein64574"
         target="_blank"
         rel="noopener noreferrer"
         className={iconClass}
