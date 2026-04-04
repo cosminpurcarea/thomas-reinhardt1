@@ -4,12 +4,15 @@ import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { isClerkConfigured } from "@/lib/clerk/isClerkConfigured";
 import { getSanityWriteClient } from "@/lib/sanity/client";
+import { optionalUploadListingImageFromFormData } from "@/lib/sanity/uploadListingImageFromForm";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
 
+/** Per-file caps (Sanity / product rules). */
 const MAX_BYTES = 40 * 1024 * 1024;
-const MAX_IMAGE_BYTES = 12 * 1024 * 1024;
+/** Vercel serverless request body limit (Hobby/Pro default). Multipart = PDF + image + overhead. */
+const VERCEL_BODY_LIMIT_BYTES = Math.floor(4.5 * 1024 * 1024);
 
 function isAdminEmail(email: string, adminEmailsRaw: string | undefined) {
   if (!adminEmailsRaw) return false;
@@ -50,74 +53,6 @@ function isAllowedUpload(name: string, mime: string) {
   return mimeOk;
 }
 
-function isAllowedListingImage(name: string, mime: string) {
-  const lower = name.toLowerCase();
-  const extOk =
-    lower.endsWith(".png") ||
-    lower.endsWith(".jpg") ||
-    lower.endsWith(".jpeg") ||
-    lower.endsWith(".webp");
-  if (!extOk) return false;
-  const ok =
-    mime === "image/png" ||
-    mime === "image/jpeg" ||
-    mime === "image/webp" ||
-    mime === "";
-  return ok;
-}
-
-async function uploadListingImageFromForm(
-  client: NonNullable<ReturnType<typeof getSanityWriteClient>>,
-  formData: FormData,
-  altText: string
-): Promise<{
-  _type: "image";
-  asset: { _type: "reference"; _ref: string };
-  alt?: string;
-} | null> {
-  const entry = formData.get("listingImage");
-  if (!entry || typeof entry === "string") return null;
-
-  const blob = entry as Blob;
-  if (blob.size === 0) return null;
-
-  const originalName =
-    "name" in entry && typeof entry.name === "string"
-      ? entry.name
-      : "cover.jpg";
-  const mime = blob.type || "application/octet-stream";
-
-  if (!isAllowedListingImage(originalName, mime)) {
-    throw new Error(
-      "Homepage thumbnail must be .png, .jpg, or .webp (square 1:1 recommended)."
-    );
-  }
-
-  if (blob.size > MAX_IMAGE_BYTES) {
-    throw new Error(
-      `Thumbnail too large (max ${Math.floor(MAX_IMAGE_BYTES / (1024 * 1024))} MB).`
-    );
-  }
-
-  const buffer = Buffer.from(await blob.arrayBuffer());
-  const safeName = originalName.replace(/[^\w.\-() ]+/g, "_");
-
-  const asset = await client.assets.upload("image", buffer, {
-    filename: safeName,
-    contentType: mime || undefined,
-  });
-
-  const alt = altText.trim();
-  return {
-    _type: "image",
-    asset: {
-      _type: "reference",
-      _ref: asset._id,
-    },
-    ...(alt ? { alt } : {}),
-  };
-}
-
 export async function POST(req: NextRequest) {
   if (!isClerkConfigured()) {
     return NextResponse.json(
@@ -147,6 +82,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
+  const contentLength = req.headers.get("content-length");
+  if (contentLength) {
+    const n = parseInt(contentLength, 10);
+    if (!Number.isNaN(n) && n > VERCEL_BODY_LIMIT_BYTES) {
+      return NextResponse.json(
+        {
+          error:
+            "Upload is too large for this host (~4.5 MB total per request on Vercel). Compress the PDF, upload without a thumbnail for now, or add the file in Sanity Studio.",
+        },
+        { status: 413 }
+      );
+    }
+  }
+
   const client = getSanityWriteClient();
   if (!client) {
     return NextResponse.json(
@@ -163,7 +112,10 @@ export async function POST(req: NextRequest) {
     formData = await req.formData();
   } catch {
     return NextResponse.json(
-      { error: "Invalid multipart body." },
+      {
+        error:
+          "Could not read the upload. Often this means the request is too large for the host (~4.5 MB on Vercel): use a smaller PDF, skip the thumbnail, or add the asset in Sanity Studio.",
+      },
       { status: 400 }
     );
   }
@@ -202,10 +154,10 @@ export async function POST(req: NextRequest) {
   const buffer = Buffer.from(await blob.arrayBuffer());
 
   let listingImageField: Awaited<
-    ReturnType<typeof uploadListingImageFromForm>
+    ReturnType<typeof optionalUploadListingImageFromFormData>
   > | null = null;
   try {
-    listingImageField = await uploadListingImageFromForm(
+    listingImageField = await optionalUploadListingImageFromFormData(
       client,
       formData,
       String(formData.get("listingImageAlt") ?? "")

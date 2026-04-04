@@ -28,12 +28,12 @@ export type SanityProduct = {
   downloads?: SanityDownloadItem[];
 };
 
-/** Latest published product that has a homepage thumbnail (by last update). */
+/** Latest published product by last update (thumbnail optional). */
 export type LatestListingSpotlight = {
   title: string;
   slug: string;
   description?: string | null;
-  imageUrl: string;
+  imageUrl: string | null;
   alt: string;
   updatedAt: string;
 };
@@ -64,7 +64,7 @@ export async function getProducts(): Promise<SanityProduct[]> {
   const client = getSanityClient();
   if (!client) return [];
 
-  const query = `*[_type == "product" && (!defined(published) || published == true)]|order(_createdAt desc){
+  const query = `*[_type == "product" && (!defined(published) || published == true)]|order(_updatedAt desc){
     ${productFields}
   }`;
 
@@ -95,7 +95,7 @@ export async function getLatestListingSpotlight(): Promise<LatestListingSpotligh
   const client = getSanityClient();
   if (!client) return null;
 
-  const query = `*[_type == "product" && (!defined(published) || published == true) && defined(listingImage.asset)]|order(_updatedAt desc)[0]{
+  const query = `*[_type == "product" && (!defined(published) || published == true)]|order(_updatedAt desc)[0]{
     title,
     description,
     "slug": slug.current,
@@ -106,7 +106,7 @@ export async function getLatestListingSpotlight(): Promise<LatestListingSpotligh
 
   try {
     const row = await client.fetch<LatestListingSpotlight | null>(query);
-    if (!row?.imageUrl || !row.slug) return null;
+    if (!row?.slug) return null;
     return row;
   } catch {
     return null;

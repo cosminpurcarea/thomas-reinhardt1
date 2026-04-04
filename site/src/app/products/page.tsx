@@ -39,7 +39,10 @@ export default async function ProductsPage() {
         marketing emails—it is not required for downloads.
       </p>
 
-      <ProductsCatalogueClient products={products} />
+      <ProductsCatalogueClient
+        products={products}
+        newestProductId={products[0]?._id ?? null}
+      />
     </div>
   );
 }

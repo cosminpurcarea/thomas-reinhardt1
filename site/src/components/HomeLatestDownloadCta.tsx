@@ -30,14 +30,20 @@ export default function HomeLatestDownloadCta({
           {spotlight ? (
             <div className="mx-auto w-full max-w-[179px] shrink-0 lg:order-first lg:mx-0">
               <div className="relative mx-auto aspect-square w-full max-w-[179px] overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card-strong)] shadow-[0_12px_40px_rgba(0,0,0,0.35)]">
-                <Image
-                  src={spotlight.imageUrl}
-                  alt={spotlight.alt}
-                  fill
-                  sizes="(max-width: 1024px) 179px, 179px"
-                  className="object-cover"
-                  priority
-                />
+                {spotlight.imageUrl ? (
+                  <Image
+                    src={spotlight.imageUrl}
+                    alt={spotlight.alt}
+                    fill
+                    sizes="(max-width: 1024px) 179px, 179px"
+                    className="object-cover"
+                    priority
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center text-center text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
+                    No image
+                  </div>
+                )}
                 <span className="absolute left-3 top-3 inline-flex items-center rounded-full bg-[var(--accent)] px-3 py-1 text-xs font-bold uppercase tracking-wide text-black shadow-sm">
                   New
                 </span>

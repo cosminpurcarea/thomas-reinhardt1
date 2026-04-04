@@ -10,8 +10,11 @@ type TypeFilter = "all" | "free" | "paid";
 
 export default function ProductsCatalogueClient({
   products,
+  newestProductId,
 }: {
   products: SanityProduct[];
+  /** First item from server list (newest by `_updatedAt`); used for “New” badge only. */
+  newestProductId: string | null;
 }) {
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [query, setQuery] = useState("");
@@ -112,26 +115,31 @@ export default function ProductsCatalogueClient({
           No products match your search/filter.
         </div>
       ) : viewMode === "grid" ? (
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid auto-rows-fr gap-4 md:grid-cols-2">
           {filteredProducts.map((p) => (
             <div
               key={p._id}
-              className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-5"
+              className="flex min-h-[200px] flex-col rounded-2xl border border-[var(--border)] bg-[var(--card)] p-5"
             >
-              <div className="text-sm font-semibold text-[var(--accent)]">
+              <div className="text-xs font-semibold text-[var(--accent)]">
                 {p.priceType === "paid" ? "Paid product" : "Free product"}
               </div>
-              <div className="mt-2 text-lg font-semibold text-[var(--foreground)]">
-                <Link href={`/products/${p.slug}`} className="hover:underline">
+              <div className="mt-2 text-base font-semibold leading-snug text-[var(--foreground)]">
+                <Link
+                  href={`/products/${p.slug}`}
+                  className="line-clamp-2 hover:underline"
+                >
                   {p.title}
                 </Link>
               </div>
               {p.description ? (
-                <div className="mt-2 text-sm text-[var(--muted)]">
+                <div className="mt-2 line-clamp-3 min-h-0 flex-1 text-sm leading-snug text-[var(--muted)]">
                   {p.description}
                 </div>
-              ) : null}
-              <div className="mt-4 flex flex-wrap gap-2">
+              ) : (
+                <div className="min-h-0 flex-1" />
+              )}
+              <div className="mt-4 flex flex-wrap gap-2 pt-1">
                 <Link
                   href={`/products/${p.slug}`}
                   className="inline-flex h-10 items-center justify-center rounded-full border border-[var(--border)] bg-[rgba(47,140,255,0.08)] px-5 text-sm font-semibold text-[var(--foreground)] transition hover:bg-[rgba(47,140,255,0.16)]"
@@ -156,58 +164,72 @@ export default function ProductsCatalogueClient({
         </div>
       ) : (
         <div className="space-y-4">
-          {filteredProducts.map((p) => (
+          {filteredProducts.map((p) => {
+            const showNew =
+              newestProductId !== null && p._id === newestProductId;
+            return (
             <div
               key={p._id}
-              className="rounded-3xl border border-[var(--border)] bg-[linear-gradient(180deg,rgba(47,140,255,0.12)_0%,rgba(0,0,0,0)_80%)] p-5 md:p-7"
+              className="flex min-h-[168px] flex-col rounded-3xl border border-[var(--border)] bg-[linear-gradient(180deg,rgba(47,140,255,0.12)_0%,rgba(0,0,0,0)_80%)] p-5 sm:min-h-[156px] md:p-6"
             >
-              <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
-                <div className="relative h-[120px] w-[120px] shrink-0 overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)]">
+              <div className="flex min-h-0 flex-1 flex-col gap-4 sm:flex-row sm:items-stretch">
+                <div className="relative mx-auto h-[100px] w-[100px] shrink-0 overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] sm:mx-0">
                   {p.listingImageUrl ? (
                     <Image
                       src={p.listingImageUrl}
                       alt={p.title}
                       fill
-                      sizes="120px"
+                      sizes="100px"
                       className="object-cover"
                     />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
+                    <div className="flex h-full w-full items-center justify-center text-[10px] font-semibold uppercase tracking-wide text-[var(--muted)]">
                       No image
                     </div>
                   )}
-                  <span className="absolute left-2 top-2 inline-flex items-center rounded-full bg-[var(--accent)] px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-black">
-                    New
-                  </span>
+                  {showNew ? (
+                    <span className="absolute left-1.5 top-1.5 inline-flex items-center rounded-full bg-[var(--accent)] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-black">
+                      New
+                    </span>
+                  ) : null}
                 </div>
 
-                <div className="min-w-0 flex-1">
-                  <h2 className="text-2xl font-semibold text-[var(--foreground)]">
-                    <Link href={`/products/${p.slug}`} className="hover:underline">
-                      {p.title}
-                    </Link>
-                  </h2>
-                  {p.description ? (
-                    <p className="mt-2 text-lg leading-relaxed text-[var(--muted)]">
-                      {p.description}
-                    </p>
-                  ) : null}
-                  <div className="mt-5 flex flex-wrap gap-2">
+                <div className="flex min-h-0 min-w-0 flex-1 flex-col justify-between">
+                  <div className="min-h-0">
+                    <div className="min-h-[2.75rem] sm:min-h-[3.25rem]">
+                      <h2 className="text-base font-semibold leading-snug text-[var(--foreground)] sm:text-lg">
+                        <Link
+                          href={`/products/${p.slug}`}
+                          className="line-clamp-2 hover:underline"
+                        >
+                          {p.title}
+                        </Link>
+                      </h2>
+                    </div>
+                    <div className="mt-1.5 h-[4.125rem] overflow-hidden">
+                      {p.description ? (
+                        <p className="line-clamp-3 text-sm leading-snug text-[var(--muted)]">
+                          {p.description}
+                        </p>
+                      ) : null}
+                    </div>
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-2 sm:mt-2">
                     <Link
                       href={`/products/${p.slug}`}
-                      className="inline-flex h-11 items-center justify-center rounded-full border border-[var(--border)] bg-[rgba(47,140,255,0.08)] px-7 text-sm font-semibold text-[var(--foreground)] transition hover:bg-[rgba(47,140,255,0.16)]"
+                      className="inline-flex h-9 items-center justify-center rounded-full border border-[var(--border)] bg-[rgba(47,140,255,0.08)] px-5 text-xs font-semibold text-[var(--foreground)] transition hover:bg-[rgba(47,140,255,0.16)]"
                     >
                       View Details
                     </Link>
                     {p.downloads?.length ? (
                       <Link
                         href={`/products/${p.slug}/download`}
-                        className="inline-flex h-11 items-center justify-center rounded-full bg-[var(--accent)] px-7 text-sm font-semibold text-black transition hover:bg-[var(--accent-strong)]"
+                        className="inline-flex h-9 items-center justify-center rounded-full bg-[var(--accent)] px-5 text-xs font-semibold text-black transition hover:bg-[var(--accent-strong)]"
                       >
                         Download
                       </Link>
                     ) : (
-                      <span className="inline-flex h-11 items-center justify-center rounded-full border border-[var(--border)] px-7 text-sm font-semibold text-[var(--muted)] opacity-60">
+                      <span className="inline-flex h-9 items-center justify-center rounded-full border border-[var(--border)] px-5 text-xs font-semibold text-[var(--muted)] opacity-60">
                         Download unavailable
                       </span>
                     )}
@@ -215,7 +237,8 @@ export default function ProductsCatalogueClient({
                 </div>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
