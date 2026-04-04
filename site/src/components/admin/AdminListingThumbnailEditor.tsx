@@ -109,8 +109,15 @@ export default function AdminListingThumbnailEditor({
     </div>
   );
 
+  /* Compact: never use w-full on this outer flex child — it steals the whole row and hides title/body. Hero: w-full to fill the max-w-[179px] column. */
   return (
-    <div className="relative w-full">
+    <div
+      className={
+        variant === "hero"
+          ? "relative w-full max-w-full"
+          : "relative w-fit max-w-full shrink-0"
+      }
+    >
       {inner}
       {message ? (
         <p
