@@ -42,8 +42,8 @@ export default function RootLayout({
           <a href="/" className="flex items-center gap-3 justify-self-start">
             <img
               src="/branding/logo-header.png"
-              alt="Thomas Reinhardt"
-              className="h-14 w-auto object-contain object-left sm:h-16 md:h-[4.75rem] lg:h-20"
+              alt="Thomas Reinhardt — Consulting &amp; interim management"
+              className="h-16 w-auto max-h-[6rem] object-contain object-left sm:h-[4.25rem] md:h-24 lg:h-[5.5rem]"
             />
           </a>
 
