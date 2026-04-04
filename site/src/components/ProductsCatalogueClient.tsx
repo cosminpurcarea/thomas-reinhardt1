@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useMemo, useState } from "react";
+import AdminListingThumbnailEditor from "@/components/admin/AdminListingThumbnailEditor";
 import type { SanityProduct } from "@/lib/sanity/queries";
 
 type ViewMode = "grid" | "lines";
@@ -11,10 +12,13 @@ type TypeFilter = "all" | "free" | "paid";
 export default function ProductsCatalogueClient({
   products,
   newestProductId,
+  isAdmin = false,
 }: {
   products: SanityProduct[];
   /** First item from server list (newest by `_updatedAt`); used for “New” badge only. */
   newestProductId: string | null;
+  /** Listing thumbnails become tappable to replace (API still enforces admin). */
+  isAdmin?: boolean;
 }) {
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [query, setQuery] = useState("");
@@ -173,7 +177,12 @@ export default function ProductsCatalogueClient({
               className="flex min-h-[168px] flex-col rounded-3xl border border-[var(--border)] bg-[linear-gradient(180deg,rgba(47,140,255,0.12)_0%,rgba(0,0,0,0)_80%)] p-5 sm:min-h-[156px] md:p-6"
             >
               <div className="flex min-h-0 flex-1 flex-col gap-4 sm:flex-row sm:items-stretch">
-                <div className="relative mx-auto h-[100px] w-[100px] shrink-0 overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] sm:mx-0">
+                <AdminListingThumbnailEditor
+                  isAdmin={isAdmin}
+                  productSlug={p.slug}
+                  variant="compact"
+                  className="relative mx-auto h-[100px] w-[100px] shrink-0 overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] sm:mx-0"
+                >
                   {p.listingImageUrl ? (
                     <Image
                       src={p.listingImageUrl}
@@ -188,11 +197,11 @@ export default function ProductsCatalogueClient({
                     </div>
                   )}
                   {showNew ? (
-                    <span className="absolute left-1.5 top-1.5 inline-flex items-center rounded-full bg-[var(--accent)] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-black">
+                    <span className="pointer-events-none absolute left-1.5 top-1.5 z-[3] inline-flex items-center rounded-full bg-[var(--accent)] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-black">
                       New
                     </span>
                   ) : null}
-                </div>
+                </AdminListingThumbnailEditor>
 
                 <div className="flex min-h-0 min-w-0 flex-1 flex-col justify-between">
                   <div className="min-h-0">

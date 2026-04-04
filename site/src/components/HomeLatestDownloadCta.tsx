@@ -1,4 +1,5 @@
 import Image from "next/image";
+import AdminListingThumbnailEditor from "@/components/admin/AdminListingThumbnailEditor";
 import type { LatestListingSpotlight } from "@/lib/sanity/queries";
 import ShowWhenSignedOut from "@/components/ShowWhenSignedOut";
 
@@ -9,8 +10,11 @@ const FALLBACK_BODY =
 
 export default function HomeLatestDownloadCta({
   spotlight,
+  isAdmin = false,
 }: {
   spotlight: LatestListingSpotlight | null;
+  /** When true, spotlight thumbnail is tappable to upload/replace (same check as `/admin`). */
+  isAdmin?: boolean;
 }) {
   const heading = spotlight?.title?.trim() || FALLBACK_HEADING;
   const body =
@@ -29,7 +33,12 @@ export default function HomeLatestDownloadCta({
         >
           {spotlight ? (
             <div className="mx-auto w-full max-w-[179px] shrink-0 lg:order-first lg:mx-0">
-              <div className="relative mx-auto aspect-square w-full max-w-[179px] overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card-strong)] shadow-[0_12px_40px_rgba(0,0,0,0.35)]">
+              <AdminListingThumbnailEditor
+                isAdmin={isAdmin}
+                productSlug={spotlight.slug}
+                variant="hero"
+                className="relative mx-auto aspect-square w-full max-w-[179px] overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card-strong)] shadow-[0_12px_40px_rgba(0,0,0,0.35)]"
+              >
                 {spotlight.imageUrl ? (
                   <Image
                     src={spotlight.imageUrl}
@@ -44,10 +53,10 @@ export default function HomeLatestDownloadCta({
                     No image
                   </div>
                 )}
-                <span className="absolute left-3 top-3 inline-flex items-center rounded-full bg-[var(--accent)] px-3 py-1 text-xs font-bold uppercase tracking-wide text-black shadow-sm">
+                <span className="pointer-events-none absolute left-3 top-3 z-[3] inline-flex items-center rounded-full bg-[var(--accent)] px-3 py-1 text-xs font-bold uppercase tracking-wide text-black shadow-sm">
                   New
                 </span>
-              </div>
+              </AdminListingThumbnailEditor>
             </div>
           ) : null}
 

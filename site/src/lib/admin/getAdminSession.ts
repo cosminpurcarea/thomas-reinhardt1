@@ -33,3 +33,9 @@ export async function getAdminSession(): Promise<AdminSession> {
 
   return { status: "ok", userId, email };
 }
+
+/** True when the signed-in user’s email is listed in `ADMIN_EMAILS`. */
+export async function isCurrentUserAdmin(): Promise<boolean> {
+  const session = await getAdminSession();
+  return session.status === "ok";
+}

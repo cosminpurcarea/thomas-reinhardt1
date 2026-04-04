@@ -1,4 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
+import { isCurrentUserAdmin } from "@/lib/admin/getAdminSession";
 import { getProducts } from "@/lib/sanity/queries";
 import ProductsCatalogueClient from "@/components/ProductsCatalogueClient";
 import { isClerkConfigured } from "@/lib/clerk/isClerkConfigured";
@@ -26,7 +27,10 @@ export default async function ProductsPage() {
     return null;
   }
 
-  const products = await getProducts();
+  const [products, isAdmin] = await Promise.all([
+    getProducts(),
+    isCurrentUserAdmin(),
+  ]);
 
   return (
     <div className="mx-auto w-full max-w-6xl px-6 py-12">
@@ -42,6 +46,7 @@ export default async function ProductsPage() {
       <ProductsCatalogueClient
         products={products}
         newestProductId={products[0]?._id ?? null}
+        isAdmin={isAdmin}
       />
     </div>
   );

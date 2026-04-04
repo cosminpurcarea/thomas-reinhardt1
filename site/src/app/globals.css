@@ -30,10 +30,13 @@
 }
 
 body {
-  background:
+  /* Flat base so long pages never get a “horizontal band” through the middle of content.
+     Page-level wrappers (e.g. home) add lower atmosphere where needed. */
+  background-color: var(--background);
+  background-image:
     radial-gradient(1200px circle at top right, var(--accent-soft), transparent 60%),
-    radial-gradient(900px circle at 20% 10%, rgba(0, 209, 255, 0.14), transparent 55%),
-    linear-gradient(180deg, #071a2d 0%, #041021 55%, #03101d 100%);
+    radial-gradient(900px circle at 20% 10%, rgba(0, 209, 255, 0.14), transparent 55%);
+  background-repeat: no-repeat;
   color: var(--foreground);
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
 }

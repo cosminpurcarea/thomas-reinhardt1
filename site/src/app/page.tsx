@@ -1,14 +1,19 @@
 import ShowWhenSignedOut from "@/components/ShowWhenSignedOut";
 import HomeLatestDownloadCta from "@/components/HomeLatestDownloadCta";
+import { isCurrentUserAdmin } from "@/lib/admin/getAdminSession";
 import { getLatestListingSpotlight } from "@/lib/sanity/queries";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const spotlight = await getLatestListingSpotlight();
+  const [spotlight, isAdmin] = await Promise.all([
+    getLatestListingSpotlight(),
+    isCurrentUserAdmin(),
+  ]);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex min-h-full flex-col">
+      <div className="flex flex-col">
       {/* Main banner */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0">
@@ -101,7 +106,14 @@ export default async function Home() {
         </div>
       </section>
 
-      <HomeLatestDownloadCta spotlight={spotlight} />
+      <HomeLatestDownloadCta spotlight={spotlight} isAdmin={isAdmin} />
+      </div>
+
+      {/* Lighter wash only after the article — not tied to % of total page height (which cut through long spotlight copy) */}
+      <div
+        className="min-h-[min(40vh,24rem)] w-full shrink-0 bg-[linear-gradient(180deg,#061427_0%,#0a1f38_42%,rgba(14,48,86,0.95)_100%)]"
+        aria-hidden
+      />
     </div>
   );
 }
