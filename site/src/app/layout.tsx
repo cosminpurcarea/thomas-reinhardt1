@@ -43,7 +43,7 @@ export default function RootLayout({
             <img
               src="/branding/logo-header.png"
               alt="Thomas Reinhardt"
-              className="h-12 md:h-14 w-auto"
+              className="h-14 w-auto object-contain object-left sm:h-16 md:h-[4.75rem] lg:h-20"
             />
           </a>
 

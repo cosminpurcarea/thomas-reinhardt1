@@ -42,7 +42,7 @@ export default function AuthSplitLayout({
             <img
               src="/branding/logo-header.png"
               alt="Thomas Reinhardt"
-              className="h-11 w-auto md:h-12"
+              className="h-14 w-auto object-contain object-left md:h-16 lg:h-[4.75rem]"
             />
           </a>
           <h1 className="mt-10 text-2xl font-semibold tracking-tight text-white md:mt-14 md:text-3xl lg:text-[1.75rem] lg:leading-tight">
