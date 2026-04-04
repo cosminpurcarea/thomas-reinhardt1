@@ -56,6 +56,18 @@ export async function POST(req: NextRequest) {
     (payload as { productTitle?: unknown } | null)?.productTitle
       ?.toString() ?? "";
 
+  const rawRecipients = (payload as { recipientEmails?: unknown } | null)
+    ?.recipientEmails;
+  let recipientEmails: string[] | undefined;
+  if (rawRecipients !== undefined) {
+    if (!Array.isArray(rawRecipients)) {
+      return new NextResponse("recipientEmails must be an array.", {
+        status: 400,
+      });
+    }
+    recipientEmails = rawRecipients.map((e) => String(e).trim()).filter(Boolean);
+  }
+
   if (!productSlug || !productTitle) {
     return new NextResponse(
       "Missing productSlug and/or productTitle.",
@@ -66,6 +78,7 @@ export async function POST(req: NextRequest) {
   const result = await sendGDPRSafeFreeProductRelease({
     productSlug,
     productTitle,
+    recipientEmails,
   });
 
   return NextResponse.json(result);

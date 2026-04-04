@@ -45,6 +45,17 @@ a {
   color: inherit;
 }
 
+/* Native <select> options: OS often paints a light menu; force readable text. */
+.admin-native-select {
+  color-scheme: dark;
+  background-color: var(--card-strong);
+  color: var(--foreground);
+}
+.admin-native-select option {
+  background-color: #0b2340;
+  color: #eaf3ff;
+}
+
 /* Clerk SignIn/SignUp host: default text stays light on navy (variables + elements handle specifics). */
 .auth-clerk-host {
   color: #f8fafc;

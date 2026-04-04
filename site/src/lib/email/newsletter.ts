@@ -40,7 +40,8 @@ function excerptProductDescription(raw: string | null | undefined): string {
   return (lastSpace > 60 ? cut.slice(0, lastSpace) : cut) + "\u2026";
 }
 
-async function getConsentedUserEmails(): Promise<string[]> {
+/** Users with `newsletterConsent` in Clerk public metadata (paginated). */
+export async function getConsentedUserEmails(): Promise<string[]> {
   const client = await clerkClient();
 
   // Keep this conservative for now. We can extend pagination later.
@@ -78,6 +79,25 @@ async function getConsentedUserEmails(): Promise<string[]> {
   return emails;
 }
 
+function filterToConsentedRecipients(
+  consented: string[],
+  requested: string[]
+): string[] {
+  const byLower = new Map(consented.map((e) => [e.toLowerCase(), e]));
+  const out: string[] = [];
+  const seen = new Set<string>();
+  for (const r of requested) {
+    const key = r.trim().toLowerCase();
+    if (!key || seen.has(key)) continue;
+    const canonical = byLower.get(key);
+    if (canonical) {
+      seen.add(key);
+      out.push(canonical);
+    }
+  }
+  return out;
+}
+
 export type SendNewsletterInput = {
   subject: string;
   text?: string;
@@ -96,6 +116,12 @@ export type SendNewsletterInput = {
     text?: string;
     html?: string;
   };
+  /**
+   * If set, only these addresses receive the message (must match consented users;
+   * unknown addresses are ignored). Empty array sends to nobody.
+   * If omitted, all consented users receive it.
+   */
+  recipientEmails?: string[];
 };
 
 export async function sendGDPRSafeNewsletter(
@@ -107,7 +133,11 @@ export async function sendGDPRSafeNewsletter(
     throw new Error("Resend is not configured (missing API key/from email).");
   }
 
-  const recipients = await getConsentedUserEmails();
+  const allConsented = await getConsentedUserEmails();
+  const recipients =
+    input.recipientEmails !== undefined
+      ? filterToConsentedRecipients(allConsented, input.recipientEmails)
+      : allConsented;
   if (recipients.length === 0) return { recipients: 0 };
 
   for (const recipient of recipients) {
@@ -155,6 +185,8 @@ export async function sendGDPRSafeNewsletter(
 export async function sendGDPRSafeFreeProductRelease(input: {
   productTitle: string;
   productSlug: string;
+  /** Subset of consented recipients; if omitted, all consented users. */
+  recipientEmails?: string[];
 }) {
   const envBase = getPublicSiteUrl();
   const origin = emailPublicOrigin(envBase);
@@ -175,6 +207,7 @@ export async function sendGDPRSafeFreeProductRelease(input: {
   return sendGDPRSafeNewsletter({
     subject: `New free download: ${safeTitle}`,
     attachments: [],
+    recipientEmails: input.recipientEmails,
     renderForRecipient: (recipientEmail) => {
       const token = createUnsubscribeToken(recipientEmail);
       const unsubscribeUrl = `${origin}/newsletter/unsubscribe?e=${encodeURIComponent(
